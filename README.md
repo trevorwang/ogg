@@ -4,30 +4,44 @@
 
 ## 使用方法
 
-函数1：`OggToWavByPath(input string, output string) error`
-```golang
+```
+
+import (
+	"context"
+	"log"
+	"testing"
+
+	"github.com/sashabaranov/go-openai"
+)
+
 func TestOggToWavByPath(t *testing.T) {
 	oggfile := "ogg.ogg"
 	wavfile := "output.wav"
+
 	OggToWavByPath(oggfile, wavfile)
-}
-```
-函数2：`OggToWav(input io.Reader, output io.WriteSeeker) error`
-```golang
 
-func main() {
-	input, err := os.Open(ogg)
+	config := openai.DefaultConfig("token")
+	// proxyUrl, err := url.Parse("http://localhost:7890")
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// transport := &http.Transport{
+	// 	Proxy: http.ProxyURL(proxyUrl),
+	// }
+	// config.HTTPClient = &http.Client{
+	// 	Transport: transport,
+	// }
+	c := openai.NewClientWithConfig(config)
+
+	res, err := c.CreateTranscription(context.Background(), openai.AudioRequest{
+		Model:    openai.Whisper1,
+		FilePath: wavfile,
+	})
 	if err != nil {
-		return err
-	}
-	defer input.Close()
-
-	output, err := os.Create(wav)
-	if err != nil {
-		return err
+		log.Panicln(err)
 	}
 
-	defer output.Close()
-	return OggToWav(input, output)
+	println(res.Text)
+
 }
 ```
