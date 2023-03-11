@@ -4,7 +4,7 @@
 
 ## 使用方法
 
-```
+```golang
 
 import (
 	"context"
